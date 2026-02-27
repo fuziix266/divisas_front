@@ -50,7 +50,7 @@ class _IngresoSolScreenState extends State<IngresoSolScreen> {
           children: [
             // Header con paso
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
               child: Row(
                 children: [
                   const SizedBox(width: 40), // Spacer
@@ -88,7 +88,7 @@ class _IngresoSolScreenState extends State<IngresoSolScreen> {
               ),
             ),
 
-            const SizedBox(height: 32),
+            const SizedBox(height: 16),
 
             // Título y descripción
             Padding(
@@ -98,19 +98,19 @@ class _IngresoSolScreenState extends State<IngresoSolScreen> {
                   Text(
                     'Ingresa el valor del Sol',
                     style: GoogleFonts.inter(
-                      fontSize: 24,
+                      fontSize: 22,
                       fontWeight: FontWeight.w700,
                       color: AppTheme.textDark,
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 4),
                   Text(
                     '¿A cuántos pesos chilenos compraste el sol?\nEj: Si pagaste 260 pesos por 1 sol, ingresa 260.',
                     style: GoogleFonts.inter(
-                      fontSize: 14,
+                      fontSize: 13,
                       color: Colors.grey.shade500,
-                      height: 1.5,
+                      height: 1.4,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -121,79 +121,81 @@ class _IngresoSolScreenState extends State<IngresoSolScreen> {
             // Valor grande
             Expanded(
               child: Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.baseline,
-                      textBaseline: TextBaseline.alphabetic,
-                      children: [
-                        Text(
-                          '\$',
-                          style: GoogleFonts.inter(
-                            fontSize: 36,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.grey.shade400,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          _displayValue,
-                          style: GoogleFonts.inter(
-                            fontSize: 64,
-                            fontWeight: FontWeight.w700,
-                            color: AppTheme.textDark,
-                          ),
-                        ),
-                        Container(
-                          width: 3,
-                          height: 50,
-                          margin: const EdgeInsets.only(left: 4),
-                          decoration: BoxDecoration(
-                            color: AppTheme.primaryColor,
-                            borderRadius: BorderRadius.circular(2),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    // Badge CLP/SOL
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 10,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(24),
-                        border: Border.all(color: Colors.grey.shade200),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.03),
-                            blurRadius: 8,
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.baseline,
+                        textBaseline: TextBaseline.alphabetic,
                         children: [
-                          Text('🇨🇱', style: const TextStyle(fontSize: 20)),
-                          const SizedBox(width: 8),
                           Text(
-                            'CLP por 1 SOL',
+                            '\$',
                             style: GoogleFonts.inter(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.grey.shade700,
+                              fontSize: 32,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.grey.shade400,
                             ),
                           ),
-                          const SizedBox(width: 4),
-                          Text('🇵🇪', style: const TextStyle(fontSize: 20)),
+                          const SizedBox(width: 8),
+                          Text(
+                            _displayValue,
+                            style: GoogleFonts.inter(
+                              fontSize: 56,
+                              fontWeight: FontWeight.w700,
+                              color: AppTheme.textDark,
+                            ),
+                          ),
+                          Container(
+                            width: 3,
+                            height: 44,
+                            margin: const EdgeInsets.only(left: 4),
+                            decoration: BoxDecoration(
+                              color: AppTheme.primaryColor,
+                              borderRadius: BorderRadius.circular(2),
+                            ),
+                          ),
                         ],
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 12),
+                      // Badge CLP/SOL
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(color: Colors.grey.shade200),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.03),
+                              blurRadius: 8,
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text('🇨🇱', style: const TextStyle(fontSize: 18)),
+                            const SizedBox(width: 6),
+                            Text(
+                              'CLP por 1 SOL',
+                              style: GoogleFonts.inter(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.grey.shade700,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            Text('🇵🇪', style: const TextStyle(fontSize: 18)),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -203,7 +205,7 @@ class _IngresoSolScreenState extends State<IngresoSolScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: SizedBox(
                 width: double.infinity,
-                height: 56,
+                height: 52,
                 child: ElevatedButton(
                   onPressed: _input.isNotEmpty
                       ? () async {
@@ -211,6 +213,7 @@ class _IngresoSolScreenState extends State<IngresoSolScreen> {
                           if (valor != null && valor > 0) {
                             final provider = context.read<ConversionProvider>();
                             await provider.guardarTasa(valor);
+                            provider.limpiar();
                             if (context.mounted) {
                               Navigator.pushReplacementNamed(
                                 context,
@@ -224,7 +227,7 @@ class _IngresoSolScreenState extends State<IngresoSolScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 4),
             Text(
               'PUEDES CAMBIAR ESTE VALOR DESPUÉS',
               style: GoogleFonts.inter(
@@ -235,7 +238,7 @@ class _IngresoSolScreenState extends State<IngresoSolScreen> {
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 4),
 
             // Teclado numérico
             NumericKeypad(

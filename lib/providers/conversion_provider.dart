@@ -10,12 +10,14 @@ class ConversionProvider with ChangeNotifier {
   double _montoSoles = 0.0;
   double _montoPesos = 0.0;
   String _inputDisplay = '';
+  bool _solAPeso = true; // true = SOL→CLP, false = CLP→SOL
 
   TasaCambio? get tasaActual => _tasaActual;
   double get montoSoles => _montoSoles;
   double get montoPesos => _montoPesos;
   String get inputDisplay => _inputDisplay;
   bool get tieneTasa => _tasaActual != null;
+  bool get solAPeso => _solAPeso;
 
   Future<void> cargarTasaActiva() async {
     _tasaActual = await _db.getTasaActiva();
@@ -33,15 +35,32 @@ class ConversionProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void toggleDireccion() {
+    _solAPeso = !_solAPeso;
+    // Limpiar input al cambiar dirección
+    _inputDisplay = '';
+    _montoSoles = 0.0;
+    _montoPesos = 0.0;
+    notifyListeners();
+  }
+
   void actualizarMonto(String input) {
     _inputDisplay = input;
     if (input.isEmpty || input == '.') {
       _montoSoles = 0.0;
       _montoPesos = 0.0;
     } else {
-      _montoSoles = double.tryParse(input) ?? 0.0;
+      final valor = double.tryParse(input) ?? 0.0;
       if (_tasaActual != null) {
-        _montoPesos = _montoSoles * _tasaActual!.valorSol;
+        if (_solAPeso) {
+          // SOL → CLP: usuario ingresa soles
+          _montoSoles = valor;
+          _montoPesos = valor * _tasaActual!.valorSol;
+        } else {
+          // CLP → SOL: usuario ingresa pesos
+          _montoPesos = valor;
+          _montoSoles = valor / _tasaActual!.valorSol;
+        }
       }
     }
     notifyListeners();
@@ -61,7 +80,6 @@ class ConversionProvider with ChangeNotifier {
       tasaUsada: _tasaActual?.valorSol ?? 0.0,
       nota: nota,
       fecha: DateTime.now().toIso8601String(),
-      synced: false,
     );
     await _db.insertConversion(conversion);
     return conversion;

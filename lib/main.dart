@@ -3,36 +3,17 @@ import 'package:provider/provider.dart';
 import 'theme/app_theme.dart';
 import 'providers/conversion_provider.dart';
 import 'providers/historial_provider.dart';
+import 'screens/splash_screen.dart';
 import 'screens/ingreso_sol_screen.dart';
 import 'screens/conversor_screen.dart';
-import 'services/sync_service.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(const DivisasApp());
 }
 
-class DivisasApp extends StatefulWidget {
+class DivisasApp extends StatelessWidget {
   const DivisasApp({super.key});
-
-  @override
-  State<DivisasApp> createState() => _DivisasAppState();
-}
-
-class _DivisasAppState extends State<DivisasApp> {
-  final SyncService _syncService = SyncService();
-
-  @override
-  void initState() {
-    super.initState();
-    _syncService.iniciarMonitoreo();
-  }
-
-  @override
-  void dispose() {
-    _syncService.detenerMonitoreo();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,30 +30,11 @@ class _DivisasAppState extends State<DivisasApp> {
         theme: AppTheme.lightTheme,
         initialRoute: '/',
         routes: {
-          '/': (context) => const _InitialRoute(),
+          '/': (context) => const SplashScreen(),
           '/ingreso': (context) => const IngresoSolScreen(),
           '/conversor': (context) => const ConversorScreen(),
         },
       ),
-    );
-  }
-}
-
-/// Ruta inicial que decide si ir al ingreso de tasa o directo al conversor
-class _InitialRoute extends StatelessWidget {
-  const _InitialRoute();
-
-  @override
-  Widget build(BuildContext context) {
-    return Consumer<ConversionProvider>(
-      builder: (context, provider, child) {
-        // Si ya tiene tasa, ir al conversor directamente
-        if (provider.tieneTasa) {
-          return const ConversorScreen();
-        }
-        // Si no, ir al ingreso del valor del sol
-        return const IngresoSolScreen();
-      },
     );
   }
 }

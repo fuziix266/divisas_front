@@ -6,6 +6,7 @@ import '../providers/historial_provider.dart';
 import '../theme/app_theme.dart';
 import '../widgets/numeric_keypad.dart';
 import '../widgets/guardar_modal.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ConversorScreen extends StatefulWidget {
   const ConversorScreen({super.key});
@@ -156,14 +157,72 @@ class _ConversorScreenState extends State<ConversorScreen> {
                   IconButton(
                     icon: const Icon(Icons.tune),
                     onPressed: () {
-                      Navigator.pushReplacementNamed(context, '/ingreso');
+                      showDialog(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          title: Text(
+                            '¿Cambiar valor del sol?',
+                            style: GoogleFonts.inter(
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          content: Text(
+                            'Podrás ingresar un nuevo valor de cambio para tu conversión.',
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(ctx),
+                              child: Text(
+                                'Cancelar',
+                                style: GoogleFonts.inter(
+                                  fontSize: 13,
+                                  color: Colors.grey.shade500,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppTheme.primaryColor,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 8,
+                                ),
+                                textStyle: GoogleFonts.inter(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              onPressed: () {
+                                Navigator.pop(ctx);
+                                provider.limpiar();
+                                Navigator.pushReplacementNamed(
+                                  context,
+                                  '/ingreso',
+                                );
+                              },
+                              child: const Text('Sí, cambiar'),
+                            ),
+                          ],
+                        ),
+                      );
                     },
                     tooltip: 'Cambiar tasa',
                   ),
                   Text(
-                    'Conversor',
+                    tasa != null
+                        ? '1 SOL = ${tasa.valorSol.toStringAsFixed(0)} CLP'
+                        : 'Conversor',
                     style: GoogleFonts.inter(
-                      fontSize: 18,
+                      fontSize: 16,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -178,258 +237,252 @@ class _ConversorScreenState extends State<ConversorScreen> {
               ),
             ),
 
-            // Cards de conversión
+            // Zona de conversión
             Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Card FROM (Soles)
+                    // Pregunta principal
+                    Text(
+                      provider.solAPeso
+                          ? '¿Cuántos soles pagarás?'
+                          : '¿Cuántos pesos pagarás?',
+                      style: GoogleFonts.inter(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: AppTheme.textDark,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Card INPUT - lo que el usuario ingresa
                     Container(
-                      padding: const EdgeInsets.all(20),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 16,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: AppTheme.primaryColor.withValues(alpha: 0.05),
+                          color: AppTheme.primaryColor.withValues(alpha: 0.3),
+                          width: 1.5,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.03),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
+                            color: AppTheme.primaryColor.withValues(
+                              alpha: 0.08,
+                            ),
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
                           ),
                         ],
                       ),
                       child: Row(
                         children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                          // Bandera + moneda
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade50,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Row(
                               children: [
                                 Text(
-                                  'DESDE',
-                                  style: GoogleFonts.inter(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.grey.shade500,
-                                    letterSpacing: 1,
-                                  ),
+                                  provider.solAPeso ? '🇵🇪' : '🇨🇱',
+                                  style: const TextStyle(fontSize: 24),
                                 ),
-                                const SizedBox(height: 8),
-                                Row(
-                                  children: [
-                                    const Text(
-                                      '🇵🇪',
-                                      style: TextStyle(fontSize: 28),
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'SOL',
-                                          style: GoogleFonts.inter(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                        ),
-                                        Text(
-                                          'Sol Peruano',
-                                          style: GoogleFonts.inter(
-                                            fontSize: 12,
-                                            color: Colors.grey.shade500,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
+                                const SizedBox(width: 6),
+                                Text(
+                                  provider.solAPeso ? 'SOL' : 'CLP',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.grey.shade700,
+                                  ),
                                 ),
                               ],
                             ),
                           ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                'S/',
-                                style: GoogleFonts.inter(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppTheme.primaryColor,
-                                ),
-                              ),
-                              Text(
-                                provider.inputDisplay.isEmpty
-                                    ? '0.00'
-                                    : provider.montoSoles.toStringAsFixed(2),
-                                style: GoogleFonts.inter(
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ],
+                          const Spacer(),
+                          // Monto ingresado
+                          Text(
+                            provider.solAPeso ? 'S/ ' : '\$ ',
+                            style: GoogleFonts.inter(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.grey.shade400,
+                            ),
+                          ),
+                          Text(
+                            provider.inputDisplay.isEmpty
+                                ? '0'
+                                : provider.inputDisplay,
+                            style: GoogleFonts.inter(
+                              fontSize: 32,
+                              fontWeight: FontWeight.w700,
+                              color: AppTheme.textDark,
+                            ),
                           ),
                         ],
                       ),
                     ),
 
-                    // Botón swap (decorativo)
+                    // Botón swap
                     Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4),
-                      child: Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: AppTheme.primaryColor,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: AppTheme.backgroundLight,
-                            width: 4,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppTheme.primaryColor.withValues(
-                                alpha: 0.3,
+                      padding: const EdgeInsets.symmetric(vertical: 6),
+                      child: GestureDetector(
+                        onTap: () => provider.toggleDireccion(),
+                        child: Container(
+                          width: 44,
+                          height: 44,
+                          decoration: BoxDecoration(
+                            color: AppTheme.primaryColor,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppTheme.primaryColor.withValues(
+                                  alpha: 0.3,
+                                ),
+                                blurRadius: 10,
+                                offset: const Offset(0, 3),
                               ),
-                              blurRadius: 8,
-                            ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.swap_vert,
-                          color: Colors.white,
-                          size: 20,
+                            ],
+                          ),
+                          child: const Icon(
+                            Icons.swap_vert,
+                            color: Colors.white,
+                            size: 22,
+                          ),
                         ),
                       ),
                     ),
 
-                    // Card TO (Pesos)
+                    // Card RESULTADO
                     Container(
-                      padding: const EdgeInsets.all(20),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 16,
+                      ),
                       decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: AppTheme.primaryColor.withValues(alpha: 0.05),
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.03),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
+                        color: Colors.grey.shade50,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: Colors.grey.shade200),
                       ),
                       child: Row(
                         children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                          // Bandera + moneda
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Row(
                               children: [
                                 Text(
-                                  'A',
-                                  style: GoogleFonts.inter(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.grey.shade500,
-                                    letterSpacing: 1,
-                                  ),
+                                  provider.solAPeso ? '🇨🇱' : '🇵🇪',
+                                  style: const TextStyle(fontSize: 24),
                                 ),
-                                const SizedBox(height: 8),
-                                Row(
-                                  children: [
-                                    const Text(
-                                      '🇨🇱',
-                                      style: TextStyle(fontSize: 28),
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'CLP',
-                                          style: GoogleFonts.inter(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                        ),
-                                        Text(
-                                          'Peso Chileno',
-                                          style: GoogleFonts.inter(
-                                            fontSize: 12,
-                                            color: Colors.grey.shade500,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
+                                const SizedBox(width: 6),
+                                Text(
+                                  provider.solAPeso ? 'CLP' : 'SOL',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.grey.shade700,
+                                  ),
                                 ),
                               ],
                             ),
                           ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                '\$',
-                                style: GoogleFonts.inter(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppTheme.primaryColor,
-                                ),
+                          const Spacer(),
+                          // Monto resultado
+                          Flexible(
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    provider.solAPeso ? '\$ ' : 'S/ ',
+                                    style: GoogleFonts.inter(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.grey.shade400,
+                                    ),
+                                  ),
+                                  Text(
+                                    provider.solAPeso
+                                        ? provider.montoPesos.toStringAsFixed(0)
+                                        : provider.montoSoles.toStringAsFixed(
+                                            2,
+                                          ),
+                                    style: GoogleFonts.inter(
+                                      fontSize: 32,
+                                      fontWeight: FontWeight.w700,
+                                      color: AppTheme.textDark,
+                                    ),
+                                  ),
+                                ],
                               ),
-                              Text(
-                                provider.montoPesos.toStringAsFixed(0),
-                                style: GoogleFonts.inter(
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
                         ],
                       ),
                     ),
 
-                    // Badge de tasa
-                    if (tasa != null)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 16),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
+                    const SizedBox(height: 16),
+
+                    // Frase descriptiva
+                    if (provider.inputDisplay.isNotEmpty &&
+                        provider.inputDisplay != '.' &&
+                        provider.inputDisplay != '0')
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFF7518),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          provider.solAPeso
+                              ? 'S/${provider.montoSoles.toStringAsFixed(2)} soles peruanos son \$${provider.montoPesos.toStringAsFixed(0)} pesos chilenos'
+                              : '\$${provider.montoPesos.toStringAsFixed(0)} pesos chilenos son S/${provider.montoSoles.toStringAsFixed(2)} soles peruanos',
+                          style: GoogleFonts.inter(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.white,
                           ),
-                          decoration: BoxDecoration(
-                            color: AppTheme.primaryColor.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.trending_up,
-                                size: 14,
-                                color: AppTheme.primaryColor,
-                              ),
-                              const SizedBox(width: 6),
-                              Text(
-                                '1 SOL = ${tasa.valorSol.toStringAsFixed(0)} CLP',
-                                style: GoogleFonts.inter(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppTheme.primaryColor,
-                                ),
-                              ),
-                            ],
-                          ),
+                          textAlign: TextAlign.center,
                         ),
                       ),
                   ],
+                ),
+              ),
+            ),
+
+            // Publicidad
+            Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Text(
+                'www.retrobox.cl',
+                style: GoogleFonts.inter(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.grey.shade400,
                 ),
               ),
             ),
@@ -667,6 +720,82 @@ class _HistorialTabState extends State<_HistorialTab> {
                         return _buildHistorialCard(item, provider);
                       },
                     ),
+            ),
+
+            // Enlace publicidad
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: GestureDetector(
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (ctx) => AlertDialog(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      title: Text(
+                        '¿Quieres visitar nuestra página?',
+                        style: GoogleFonts.inter(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 16,
+                        ),
+                      ),
+                      content: Text(
+                        'Serás redirigido a www.retrobox.cl en tu navegador.',
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(ctx),
+                          child: Text(
+                            'No, gracias',
+                            style: GoogleFonts.inter(
+                              fontSize: 13,
+                              color: Colors.grey.shade500,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppTheme.primaryColor,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                            textStyle: GoogleFonts.inter(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          onPressed: () {
+                            Navigator.pop(ctx);
+                            launchUrl(
+                              Uri.parse('https://www.retrobox.cl'),
+                              mode: LaunchMode.externalApplication,
+                            );
+                          },
+                          child: const Text('Sí, visitarla'),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+                child: Text(
+                  'www.retrobox.cl',
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.grey.shade400,
+                    decoration: TextDecoration.underline,
+                    decorationColor: Colors.grey.shade400,
+                  ),
+                ),
+              ),
             ),
           ],
         );
