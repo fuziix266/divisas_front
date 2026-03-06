@@ -16,14 +16,15 @@ class ConversionGuardada {
   });
 
   Map<String, dynamic> toMap() {
-    return {
-      'id': id,
+    final map = <String, dynamic>{
       'monto_soles': montoSoles,
       'monto_pesos': montoPesos,
       'tasa_usada': tasaUsada,
       'nota': nota,
       'fecha': fecha,
     };
+    if (id != null) map['id'] = id;
+    return map;
   }
 
   factory ConversionGuardada.fromMap(Map<String, dynamic> map) {

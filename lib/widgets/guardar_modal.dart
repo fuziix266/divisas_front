@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import '../theme/app_theme.dart';
+
+String _formatPesos(double valor) {
+  final formatter = NumberFormat('#,##0', 'en_US');
+  return formatter.format(valor.round());
+}
 
 class GuardarModal extends StatefulWidget {
   final double montoSoles;
@@ -132,7 +138,7 @@ class _GuardarModalState extends State<GuardarModal> {
                         ),
                       ),
                       Text(
-                        '\$ ${widget.montoPesos.toStringAsFixed(0)} CLP',
+                        '\$ ${_formatPesos(widget.montoPesos)} CLP',
                         style: GoogleFonts.inter(
                           fontSize: 22,
                           fontWeight: FontWeight.w700,

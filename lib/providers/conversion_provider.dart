@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../database/database_helper.dart';
 import '../models/tasa_cambio.dart';
 import '../models/conversion_guardada.dart';
+import '../main.dart';
 
 class ConversionProvider with ChangeNotifier {
   final DatabaseHelper _db = DatabaseHelper();
@@ -19,6 +20,17 @@ class ConversionProvider with ChangeNotifier {
   bool get tieneTasa => _tasaActual != null;
   bool get solAPeso => _solAPeso;
 
+  /// Verifica si hay tasa activa Y es del mismo día
+  bool get tieneTasaVigente {
+    if (_tasaActual == null) return false;
+    final fechaTasa = DateTime.tryParse(_tasaActual!.fechaRegistro);
+    if (fechaTasa == null) return false;
+    final hoy = DateTime.now();
+    return fechaTasa.year == hoy.year &&
+        fechaTasa.month == hoy.month &&
+        fechaTasa.day == hoy.day;
+  }
+
   Future<void> cargarTasaActiva() async {
     _tasaActual = await _db.getTasaActiva();
     notifyListeners();
@@ -33,6 +45,12 @@ class ConversionProvider with ChangeNotifier {
     await _db.insertTasa(tasa);
     _tasaActual = tasa;
     notifyListeners();
+
+    // Analytics: tipo de cambio actualizado
+    analytics.logEvent(
+      name: 'tipo_cambio_actualizado',
+      parameters: {'valor_sol': valorSol},
+    );
   }
 
   void toggleDireccion() {
@@ -66,10 +84,18 @@ class ConversionProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void limpiarInput() {
+    _inputDisplay = '';
+    _montoSoles = 0.0;
+    _montoPesos = 0.0;
+    notifyListeners();
+  }
+
   void limpiar() {
     _inputDisplay = '';
     _montoSoles = 0.0;
     _montoPesos = 0.0;
+    _solAPeso = true;
     notifyListeners();
   }
 
@@ -82,6 +108,17 @@ class ConversionProvider with ChangeNotifier {
       fecha: DateTime.now().toIso8601String(),
     );
     await _db.insertConversion(conversion);
+
+    // Analytics: valor guardado
+    analytics.logEvent(
+      name: 'valor_guardado',
+      parameters: {
+        'valor_soles': _montoSoles,
+        'valor_pesos': _montoPesos,
+        'tipo': _solAPeso ? 'sol_a_peso' : 'peso_a_sol',
+      },
+    );
+
     return conversion;
   }
 }

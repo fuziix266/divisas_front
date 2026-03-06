@@ -147,15 +147,6 @@ class _IngresoSolScreenState extends State<IngresoSolScreen> {
                               color: AppTheme.textDark,
                             ),
                           ),
-                          Container(
-                            width: 3,
-                            height: 44,
-                            margin: const EdgeInsets.only(left: 4),
-                            decoration: BoxDecoration(
-                              color: AppTheme.primaryColor,
-                              borderRadius: BorderRadius.circular(2),
-                            ),
-                          ),
                         ],
                       ),
                       const SizedBox(height: 12),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'theme/app_theme.dart';
 import 'providers/conversion_provider.dart';
 import 'providers/historial_provider.dart';
@@ -7,8 +9,12 @@ import 'screens/splash_screen.dart';
 import 'screens/ingreso_sol_screen.dart';
 import 'screens/conversor_screen.dart';
 
-void main() {
+// Instancia global de Analytics
+final FirebaseAnalytics analytics = FirebaseAnalytics.instance;
+
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const DivisasApp());
 }
 
@@ -29,6 +35,7 @@ class DivisasApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme,
         initialRoute: '/',
+        navigatorObservers: [FirebaseAnalyticsObserver(analytics: analytics)],
         routes: {
           '/': (context) => const SplashScreen(),
           '/ingreso': (context) => const IngresoSolScreen(),
