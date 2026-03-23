@@ -453,7 +453,7 @@ class _ConversorScreenState extends State<ConversorScreen> {
             Navigator.pop(context);
             launchUrl(Uri.parse('tel:$numero'));
             // Analytics: emergencia consultada
-            analytics.logEvent(
+            analytics?.logEvent(
               name: 'emergencia_consultada',
               parameters: {'institucion': nombre, 'numero': numero},
             );

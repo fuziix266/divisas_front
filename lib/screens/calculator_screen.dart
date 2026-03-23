@@ -391,7 +391,7 @@ class _CalculatorScreenState extends State<CalculatorScreen>
           onTap: () {
             Navigator.pop(context);
             launchUrl(Uri.parse('tel:$numero'));
-            analytics.logEvent(
+            analytics?.logEvent(
               name: 'emergencia_consultada',
               parameters: {'institucion': nombre, 'numero': numero},
             );

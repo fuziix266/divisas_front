@@ -47,7 +47,7 @@ class ConversionProvider with ChangeNotifier {
     notifyListeners();
 
     // Analytics: tipo de cambio actualizado
-    analytics.logEvent(
+    analytics?.logEvent(
       name: 'tipo_cambio_actualizado',
       parameters: {'valor_sol': valorSol},
     );
@@ -110,7 +110,7 @@ class ConversionProvider with ChangeNotifier {
     await _db.insertConversion(conversion);
 
     // Analytics: valor guardado
-    analytics.logEvent(
+    analytics?.logEvent(
       name: 'valor_guardado',
       parameters: {
         'valor_soles': _montoSoles,
