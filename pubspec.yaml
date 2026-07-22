@@ -41,3 +41,4 @@ flutter_launcher_icons:
   image_path: "assets/images/logo_pesol.png"
   adaptive_icon_background: "#FFFFFF"
   adaptive_icon_foreground: "assets/images/logo_pesol.png"
+  remove_alpha_ios: true
