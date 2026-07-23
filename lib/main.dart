@@ -17,8 +17,12 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   if (!kIsWeb) {
-    await Firebase.initializeApp();
-    analytics = FirebaseAnalytics.instance;
+    try {
+      await Firebase.initializeApp();
+      analytics = FirebaseAnalytics.instance;
+    } catch (e, st) {
+      debugPrint('Firebase init failed (continuing without it): $e\n$st');
+    }
   }
 
   runApp(const DivisasApp());
