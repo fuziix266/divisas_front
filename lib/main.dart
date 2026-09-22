@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb, debugPrint;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -21,9 +21,16 @@ void main() async {
       await Firebase.initializeApp();
       analytics = FirebaseAnalytics.instance;
     } catch (e, st) {
-      debugPrint('Firebase init failed (continuing without it): $e\n$st');
+      debugPrint('⚠️ Error inicializando Firebase: $e');
+      debugPrint('Stack: $st');
+      // La app funciona sin Firebase, solo sin analytics
     }
   }
+
+  FlutterError.onError = (details) {
+    debugPrint('❌ FlutterError: ${details.exception}');
+    debugPrint('Stack: ${details.stack}');
+  };
 
   runApp(const DivisasApp());
 }
